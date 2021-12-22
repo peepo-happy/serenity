@@ -424,6 +424,19 @@ impl Http {
         .await
     }
 
+    pub async fn join_guild(&self, invite: &str) -> Result<()> {
+
+        self.wind(200,
+                  Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::JoinGuild {
+                invite
+            },
+        })
+        .await
+    }
+
     /// Creates an emoji in the given [`Guild`] with the given data.
     ///
     /// View the source code for [`Guild::create_emoji`] method to see what

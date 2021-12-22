@@ -20,6 +20,7 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsId(u64),
+    JoinGuildRoute,
     /// Route for the `/channels/:channel_id/invites` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -1087,6 +1088,9 @@ pub enum RouteInfo<'a> {
     DeleteChannel {
         channel_id: u64,
     },
+    JoinGuild {
+        invite: &'a str,
+    },
     DeleteStageInstance {
         channel_id: u64,
     },
@@ -1650,6 +1654,11 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Post,
                 Route::InteractionsId(interaction_id),
                 Cow::from(Route::interaction_response(interaction_id, interaction_token)),
+            ),
+            RouteInfo::JoinGuild { invite}=> (
+                LightMethod::Post,
+                Route::JoinGuildRoute,
+                Cow::from(Route::invite(invite)),
             ),
             RouteInfo::CreateInvite {
                 channel_id,
