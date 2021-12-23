@@ -21,6 +21,7 @@ pub enum Route {
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsId(u64),
     JoinGuildRoute,
+    GetRulesRoute,
     /// Route for the `/channels/:channel_id/invites` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -824,6 +825,10 @@ impl Route {
         format!(api!("/invites/{}"), code)
     }
 
+    pub fn rules(guild: u64) -> String {
+        format!(api!("/guilds/{}/member-verification?with_guild=false"), guild)
+    }
+
     pub fn invite_optioned(code: &str, stats: bool) -> String {
         format!(api!("/invites/{}?with_counts={}"), code, stats)
     }
@@ -1090,6 +1095,9 @@ pub enum RouteInfo<'a> {
     },
     JoinGuild {
         invite: &'a str,
+    },
+    GetRules {
+        guild_id: u64
     },
     DeleteStageInstance {
         channel_id: u64,
@@ -1659,6 +1667,11 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Post,
                 Route::JoinGuildRoute,
                 Cow::from(Route::invite(invite)),
+            ),
+            RouteInfo::GetRules { guild_id}=> (
+                LightMethod::Get,
+                Route::GetRulesRoute,
+                Cow::from(Route::rules(guild_id)),
             ),
             RouteInfo::CreateInvite {
                 channel_id,

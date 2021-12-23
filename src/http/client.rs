@@ -437,6 +437,17 @@ impl Http {
         .await
     }
 
+    pub async fn get_rules(&self, guild_id: u64) -> Result<Rules> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetRules {
+                guild_id,
+            },
+        })
+        .await
+    }
+
     /// Creates an emoji in the given [`Guild`] with the given data.
     ///
     /// View the source code for [`Guild::create_emoji`] method to see what

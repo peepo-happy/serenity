@@ -2942,6 +2942,23 @@ pub struct GuildInfo {
     pub permissions: Permissions,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct FormFields {
+        field_type: Value,
+        label: Value,
+        description: Value,
+        automations: Value,
+        required: Value,
+        values: Vec<Value>,
+
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Rules {
+    version: Value,
+    form_fields: Vec<FormFields>,
+}
+
 #[cfg(any(feature = "model", feature = "utils"))]
 impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
