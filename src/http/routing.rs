@@ -5,6 +5,7 @@ use std::{
 
 use super::LightMethod;
 use crate::constants;
+use crate::model::guild::Rules;
 
 /// A representation of all routes registered within the library. These are safe
 /// and memory-efficient representations of each path that functions exist for
@@ -22,6 +23,7 @@ pub enum Route {
     ChannelsId(u64),
     JoinGuildRoute,
     GetRulesRoute,
+    AcceptRulesRoute,
     /// Route for the `/channels/:channel_id/invites` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -825,8 +827,12 @@ impl Route {
         format!(api!("/invites/{}"), code)
     }
 
-    pub fn rules(guild: u64) -> String {
-        format!(api!("/guilds/{}/member-verification?with_guild=false"), guild)
+    pub fn rules(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/member-verification?with_guild=false"), guild_id)
+    }
+
+    pub fn accept_rules(guild_id: u64) -> String {
+        format!(api!("/guilds/{}/requests/@me"), guild_id)
     }
 
     pub fn invite_optioned(code: &str, stats: bool) -> String {
@@ -1098,6 +1104,10 @@ pub enum RouteInfo<'a> {
     },
     GetRules {
         guild_id: u64
+    },
+    AcceptRules {
+        guild_id: u64,
+        rules: &'a Rules
     },
     DeleteStageInstance {
         channel_id: u64,
@@ -1672,6 +1682,11 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::GetRulesRoute,
                 Cow::from(Route::rules(guild_id)),
+            ),
+            RouteInfo::AcceptRules { guild_id, rules}=> (
+                LightMethod::Post,
+                Route::AcceptRulesRoute,
+                Cow::from(Route::accept_rules(guild_id)),
             ),
             RouteInfo::CreateInvite {
                 channel_id,

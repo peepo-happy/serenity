@@ -448,6 +448,21 @@ impl Http {
         .await
     }
 
+    pub async fn accept_rules(&self, guild_id: u64, rules: &Rules) -> Result<()> {
+        let rules_json = json!(rules);
+        let body = serde_json::to_vec(&rules_json)?;
+        self.wind(201,
+                  Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::AcceptRules {
+                guild_id,
+                rules
+            },
+        })
+        .await
+    }
+
     /// Creates an emoji in the given [`Guild`] with the given data.
     ///
     /// View the source code for [`Guild::create_emoji`] method to see what
