@@ -1684,7 +1684,7 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::rules(guild_id)),
             ),
             RouteInfo::AcceptRules { guild_id, rules}=> (
-                LightMethod::Post,
+                LightMethod::Put,
                 Route::AcceptRulesRoute,
                 Cow::from(Route::accept_rules(guild_id)),
             ),
