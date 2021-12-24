@@ -448,10 +448,10 @@ impl Http {
         .await
     }
 
-    pub async fn accept_rules(&self, guild_id: u64, rules: &Rules) -> Result<Value> {
+    pub async fn accept_rules(&self, guild_id: u64, rules: &Rules) -> Result<()> {
         let rules_json = json!(rules);
         let body = serde_json::to_vec(&rules_json)?;
-        self.fire(
+        self.wind(201,
                   Request {
             body: Some(&body),
             headers: None,
