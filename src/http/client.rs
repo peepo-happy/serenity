@@ -69,6 +69,7 @@ pub struct HttpBuilder<'a> {
     token: Option<String>,
     proxy: Option<Url>,
     fut: Option<BoxFuture<'a, Result<Http>>>,
+    user_agent: Option<String>,
     #[cfg(feature = "unstable_discord_api")]
     application_id: Option<u64>,
 }
@@ -82,6 +83,7 @@ impl<'a> HttpBuilder<'a> {
             token: None,
             proxy: None,
             fut: None,
+            user_agent: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: None,
         }
@@ -110,6 +112,12 @@ impl<'a> HttpBuilder<'a> {
         //     if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
 
         self.token = Some(token);
+
+        self
+    }
+
+    pub fn user_agent(mut self, user_agent: String) -> Self {
+        self.user_agent = Some(user_agent);
 
         self
     }
@@ -194,6 +202,7 @@ impl<'a> Future for HttpBuilder<'a> {
 
             let ratelimiter_disabled = self.ratelimiter_disabled.take().unwrap();
             let proxy = self.proxy.take();
+            let user_agent = self.user_agent.take();
 
             self.fut = Some(Box::pin(async move {
                 Ok(Http {
@@ -202,6 +211,7 @@ impl<'a> Future for HttpBuilder<'a> {
                     ratelimiter_disabled,
                     proxy,
                     token,
+                    user_agent,
                     #[cfg(feature = "unstable_discord_api")]
                     application_id,
                 })
@@ -223,6 +233,7 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
+    pub user_agent: Option<String>,
     #[cfg(feature = "unstable_discord_api")]
     pub application_id: u64,
 }
@@ -234,6 +245,7 @@ impl fmt::Debug for Http {
             .field("ratelimiter", &self.ratelimiter)
             .field("ratelimiter_disabled", &self.ratelimiter_disabled)
             .field("proxy", &self.proxy)
+            .field("user_agent", &self.user_agent)
             .finish()
     }
 }
@@ -248,6 +260,7 @@ impl Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: token.to_string(),
+            user_agent: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
@@ -3434,7 +3447,7 @@ impl Http {
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
-            let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
+            let request = req.build(&self.client, &self.token, self.proxy.as_ref(), self.user_agent.as_ref())?.build()?;
             self.client.execute(request).await?
         } else {
             let ratelimiting_req = RatelimitedRequest::from(req);
@@ -3495,6 +3508,7 @@ impl Default for Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
+            user_agent: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
