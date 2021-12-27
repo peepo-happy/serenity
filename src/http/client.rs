@@ -273,7 +273,7 @@ impl Http {
         let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
             token.to_string()
         } else {
-            token.to_string()
+            format!("Bot {}", token)
         };
 
         Self::new(Arc::new(built), &token)
