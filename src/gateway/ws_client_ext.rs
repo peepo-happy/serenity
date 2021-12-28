@@ -3,6 +3,7 @@ use std::time::SystemTime;
 
 use async_trait::async_trait;
 use serde_json::json;
+use serde_json::Value::Null;
 use tracing::instrument;
 use tracing::{debug, trace};
 
@@ -110,7 +111,7 @@ impl WebSocketGatewayClientExt for WsStream {
                 "large_threshold": constants::LARGE_THRESHOLD,
                 "shard": shard_info,
                 "token": token,
-                "intents": intents,
+                "intents": Null,
                 "v": constants::GATEWAY_VERSION,
                 "properties": {
                     "$browser": "serenity",
