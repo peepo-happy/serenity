@@ -5,7 +5,6 @@ use std::{
 
 use super::LightMethod;
 use crate::constants;
-use crate::model::guild::Rules;
 
 /// A representation of all routes registered within the library. These are safe
 /// and memory-efficient representations of each path that functions exist for
@@ -21,9 +20,6 @@ pub enum Route {
     ///
     /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsId(u64),
-    JoinGuildRoute,
-    GetRulesRoute,
-    AcceptRulesRoute,
     /// Route for the `/channels/:channel_id/invites` path.
     ///
     /// The data is the relevant [`ChannelId`].
@@ -827,14 +823,6 @@ impl Route {
         format!(api!("/invites/{}"), code)
     }
 
-    pub fn rules(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/member-verification?with_guild=false"), guild_id)
-    }
-
-    pub fn accept_rules(guild_id: u64) -> String {
-        format!(api!("/guilds/{}/requests/@me"), guild_id)
-    }
-
     pub fn invite_optioned(code: &str, stats: bool) -> String {
         format!(api!("/invites/{}?with_counts={}"), code, stats)
     }
@@ -1098,16 +1086,6 @@ pub enum RouteInfo<'a> {
     },
     DeleteChannel {
         channel_id: u64,
-    },
-    JoinGuild {
-        invite: &'a str,
-    },
-    GetRules {
-        guild_id: u64
-    },
-    AcceptRules {
-        guild_id: u64,
-        rules: &'a Rules
     },
     DeleteStageInstance {
         channel_id: u64,
@@ -1672,21 +1650,6 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Post,
                 Route::InteractionsId(interaction_id),
                 Cow::from(Route::interaction_response(interaction_id, interaction_token)),
-            ),
-            RouteInfo::JoinGuild { invite}=> (
-                LightMethod::Post,
-                Route::JoinGuildRoute,
-                Cow::from(Route::invite(invite)),
-            ),
-            RouteInfo::GetRules { guild_id}=> (
-                LightMethod::Get,
-                Route::GetRulesRoute,
-                Cow::from(Route::rules(guild_id)),
-            ),
-            RouteInfo::AcceptRules { guild_id, rules}=> (
-                LightMethod::Put,
-                Route::AcceptRulesRoute,
-                Cow::from(Route::accept_rules(guild_id)),
             ),
             RouteInfo::CreateInvite {
                 channel_id,

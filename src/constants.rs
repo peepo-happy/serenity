@@ -22,12 +22,12 @@ pub const MEMBER_FETCH_LIMIT: u64 = 1000;
 /// The [UserAgent] sent along with every request.
 ///
 /// [UserAgent]: ::reqwest::header::USER_AGENT
-// pub const USER_AGENT: &str = concat!(
-//     "DiscordBot (https://github.com/serenity-rs/serenity, ",
-//     env!("CARGO_PKG_VERSION"),
-//     ")"
-// );
-pub const USER_AGENT: &str = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/1.0.37 Chrome/91.0.4472.106 Electron/13.1.4 Safari/537.36";
+pub const USER_AGENT: &str = concat!(
+    "DiscordBot (https://github.com/serenity-rs/serenity, ",
+    env!("CARGO_PKG_VERSION"),
+    ")"
+);
+// pub const USER_AGENT: &str = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.27 Safari/537.36";
 
 
 /// List of messages Discord shows on member join.

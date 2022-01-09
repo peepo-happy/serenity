@@ -83,7 +83,6 @@ impl<'a> Request<'a> {
         client: &Client,
         token: &str,
         proxy: Option<&Url>,
-        user_agent: Option<&String>
     ) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,
@@ -104,13 +103,9 @@ impl<'a> Request<'a> {
         }
 
         let mut headers = Headers::with_capacity(4);
-
-        if let Some(user_agent_value) = user_agent {
-            headers.insert(USER_AGENT, HeaderValue::from_str(user_agent_value.as_str())?);
-        } else {
-            headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));}
-
-        headers.insert(AUTHORIZATION, HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)?);
+        headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));
+        headers
+            .insert(AUTHORIZATION, HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)?);
 
         // Discord will return a 400: Bad Request response if we set the content type header,
         // but don't give a body.
