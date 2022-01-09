@@ -30,7 +30,7 @@ pub trait WebSocketGatewayClientExt {
         &mut self,
         shard_info: &[u64; 2],
         token: &str,
-        intents: GatewayIntents,
+        intents: Option<GatewayIntents>,
     ) -> Result<()>;
 
     async fn send_presence_update(
@@ -99,7 +99,7 @@ impl WebSocketGatewayClientExt for WsStream {
         &mut self,
         shard_info: &[u64; 2],
         token: &str,
-        intents: GatewayIntents,
+        intents: Option<GatewayIntents>,
     ) -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 

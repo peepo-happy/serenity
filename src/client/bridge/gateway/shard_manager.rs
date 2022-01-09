@@ -360,5 +360,5 @@ pub struct ShardManagerOptions<'a> {
     pub voice_manager: &'a Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
-    pub intents: GatewayIntents,
+    pub intents: Option<GatewayIntents>,
 }

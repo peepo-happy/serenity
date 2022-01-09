@@ -96,7 +96,7 @@ pub struct Shard {
     pub started: Instant,
     pub token: String,
     ws_url: Arc<Mutex<String>>,
-    pub intents: GatewayIntents,
+    pub intents: Option<GatewayIntents>,
 }
 
 impl Shard {
@@ -140,7 +140,7 @@ impl Shard {
         ws_url: Arc<Mutex<String>>,
         token: &str,
         shard_info: [u64; 2],
-        intents: GatewayIntents,
+        intents: Option<GatewayIntents>,
     ) -> Result<Shard> {
         let url = ws_url.lock().await.clone();
         let client = connect(&url).await?;

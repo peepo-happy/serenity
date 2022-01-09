@@ -79,7 +79,7 @@ pub struct ClientBuilder<'a> {
     data: Option<TypeMap>,
     http: Http,
     fut: Option<BoxFuture<'a, Result<Client>>>,
-    intents: GatewayIntents,
+    intents: Option<GatewayIntents>,
     #[cfg(feature = "unstable_discord_api")]
     application_id: Option<ApplicationId>,
     #[cfg(feature = "cache")]
@@ -101,7 +101,7 @@ impl<'a> ClientBuilder<'a> {
             data: Some(TypeMap::new()),
             http,
             fut: None,
-            intents: GatewayIntents::non_privileged(),
+            intents: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: None,
             #[cfg(feature = "cache")]
@@ -312,7 +312,7 @@ impl<'a> ClientBuilder<'a> {
     /// [`GatewayIntents::GUILD_PRESENCES`]: crate::client::bridge::gateway::GatewayIntents::GUILD_PRESENCES
     /// [`GatewayIntents::GUILD_MEMBERS`]: crate::client::bridge::gateway::GatewayIntents::GUILD_MEMBERS
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
-        self.intents = intents;
+        self.intents = Some(intents);
 
         self
     }

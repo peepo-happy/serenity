@@ -88,7 +88,7 @@ pub struct ShardQueuer {
     /// A copy of the URI to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
-    pub intents: GatewayIntents,
+    pub intents: Option<GatewayIntents>,
 }
 
 impl ShardQueuer {
