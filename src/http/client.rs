@@ -69,6 +69,7 @@ pub struct HttpBuilder<'a> {
     token: Option<String>,
     proxy: Option<Url>,
     fut: Option<BoxFuture<'a, Result<Http>>>,
+    user_agent: Option<String>,
     #[cfg(feature = "unstable_discord_api")]
     application_id: Option<u64>,
 }
@@ -82,6 +83,7 @@ impl<'a> HttpBuilder<'a> {
             token: None,
             proxy: None,
             fut: None,
+            user_agent: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: None,
         }
@@ -104,7 +106,7 @@ impl<'a> HttpBuilder<'a> {
     /// Sets a token for the bot. If the token is not prefixed "Bot ", this
     /// method will automatically do so.
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
-        let token = token.as_ref().trim();
+        let token = token.as_ref().trim().to_owned();
 
         let token =
             if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
@@ -114,6 +116,11 @@ impl<'a> HttpBuilder<'a> {
         self
     }
 
+    pub fn user_agent(mut self, user_agent: String) -> Self {
+        self.user_agent = Some(user_agent);
+
+        self
+    }
     /// Sets the [`reqwest::Client`]. If one isn't provided, a default one will
     /// be used.
     pub fn client(mut self, client: Arc<Client>) -> Self {
@@ -194,6 +201,7 @@ impl<'a> Future for HttpBuilder<'a> {
 
             let ratelimiter_disabled = self.ratelimiter_disabled.take().unwrap();
             let proxy = self.proxy.take();
+            let user_agent = self.user_agent.take();
 
             self.fut = Some(Box::pin(async move {
                 Ok(Http {
@@ -202,6 +210,7 @@ impl<'a> Future for HttpBuilder<'a> {
                     ratelimiter_disabled,
                     proxy,
                     token,
+                    user_agent,
                     #[cfg(feature = "unstable_discord_api")]
                     application_id,
                 })
@@ -223,6 +232,7 @@ pub struct Http {
     pub ratelimiter_disabled: bool,
     pub proxy: Option<Url>,
     pub token: String,
+    pub user_agent: Option<String>,
     #[cfg(feature = "unstable_discord_api")]
     pub application_id: u64,
 }
@@ -234,6 +244,7 @@ impl fmt::Debug for Http {
             .field("ratelimiter", &self.ratelimiter)
             .field("ratelimiter_disabled", &self.ratelimiter_disabled)
             .field("proxy", &self.proxy)
+            .field("user_agent", &self.user_agent)
             .finish()
     }
 }
@@ -250,6 +261,7 @@ impl Http {
             token: token.to_string(),
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
+            user_agent: None
         }
     }
 
@@ -273,7 +285,7 @@ impl Http {
         let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
             token.to_string()
         } else {
-            format!("Bot {}", token)
+            token.to_string()
         };
 
         Self::new(Arc::new(built), &token)
@@ -419,6 +431,45 @@ impl Http {
             headers: None,
             route: RouteInfo::CreatePrivateThread {
                 channel_id,
+            },
+        })
+        .await
+    }
+
+    pub async fn join_guild(&self, invite: &str) -> Result<()> {
+
+        self.wind(200,
+                  Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::JoinGuild {
+                invite
+            },
+        })
+        .await
+    }
+
+    pub async fn get_rules(&self, guild_id: u64) -> Result<Rules> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetRules {
+                guild_id,
+            },
+        })
+        .await
+    }
+
+    pub async fn accept_rules(&self, guild_id: u64, rules: &Rules) -> Result<()> {
+        let rules_json = json!(rules);
+        let body = serde_json::to_vec(&rules_json)?;
+        self.wind(201,
+                  Request {
+            body: Some(&body),
+            headers: None,
+            route: RouteInfo::AcceptRules {
+                guild_id,
+                rules
             },
         })
         .await
@@ -3395,7 +3446,7 @@ impl Http {
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
-            let request = req.build(&self.client, &self.token, self.proxy.as_ref())?.build()?;
+            let request = req.build(&self.client, &self.token, self.proxy.as_ref(), self.user_agent.as_ref())?.build()?;
             self.client.execute(request).await?
         } else {
             let ratelimiting_req = RatelimitedRequest::from(req);
@@ -3456,6 +3507,7 @@ impl Default for Http {
             ratelimiter_disabled: false,
             proxy: None,
             token: "".to_string(),
+            user_agent: None,
             #[cfg(feature = "unstable_discord_api")]
             application_id: 0,
         }
