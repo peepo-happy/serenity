@@ -3157,14 +3157,25 @@ impl Http {
 
         multipart = multipart.text("payload_json", serde_json::to_string(&map)?);
 
-        let response = self
+        let response = match &self.user_agent {
+            Some(user_agent) => { self
             .client
             .post(url)
-            .header(AUTHORIZATION, HeaderValue::from_str(&self.token)?)
-            .header(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT))
+            .header(AUTHORIZATION, HeaderValue::from_str(&self.token) ?)
+            .header(USER_AGENT, user_agent)
             .multipart(multipart)
             .send()
-            .await?;
+            .await? },
+            None => { self
+            .client
+            .post(url)
+            .header(AUTHORIZATION, HeaderValue::from_str(&self.token) ?)
+            .header(USER_AGENT, constants::USER_AGENT)
+            .multipart(multipart)
+            .send()
+            .await?
+            }
+        };
 
         if !response.status().is_success() {
             return Err(HttpError::from_response(response).await.into());
