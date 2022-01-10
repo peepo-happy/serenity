@@ -278,12 +278,7 @@ impl Http {
         let builder = configure_client_backend(Client::builder());
         let built = builder.build().expect("Cannot build reqwest::Client");
 
-        let trimmed = token.trim();
-        let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
-            token.to_string()
-        } else {
-            token.to_string()
-        };
+        let token = token.to_string();
 
         Self::new(Arc::new(built), &token)
     }
