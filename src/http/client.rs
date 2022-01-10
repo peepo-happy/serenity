@@ -3404,7 +3404,7 @@ impl Http {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req).await?;
-
+        debug!("Headers:{:?}",&response.headers());
         response.json::<T>().await.map_err(From::from)
     }
 
