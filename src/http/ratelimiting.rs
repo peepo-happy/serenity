@@ -157,7 +157,7 @@ impl Ratelimiter {
     ///
     /// [`Error::Http`]: crate::error::Error::Http
     #[instrument]
-    pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
+    pub async fn perform(&self, req: RatelimitedRequest<'_>, user_agent: Option<&String>) -> Result<Response> {
         let RatelimitedRequest {
             req,
         } = req;
@@ -189,8 +189,8 @@ impl Ratelimiter {
 
             bucket.lock().await.pre_hook(&route).await;
 
-            let request = req.build(&self.client, &self.token, None, None)?.build()?;
-            debug!("Headers:{:?}",&request.headers());
+            let request = req.build(&self.client, &self.token, None, user_agent)?.build()?;
+            println!("Headers:{:?}",&request.headers());
             let response = self.client.execute(request).await?;
 
             // Check if the request got ratelimited by checking for status 429,

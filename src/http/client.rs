@@ -3444,7 +3444,7 @@ impl Http {
             self.client.execute(request).await?
         } else {
             let ratelimiting_req = RatelimitedRequest::from(req);
-            self.ratelimiter.perform(ratelimiting_req).await?
+            self.ratelimiter.perform(ratelimiting_req, self.user_agent.as_ref()).await?
         };
 
         if response.status().is_success() {
