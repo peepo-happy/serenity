@@ -108,9 +108,6 @@ impl<'a> HttpBuilder<'a> {
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         let token = token.as_ref().trim().to_owned();
 
-        let token =
-            if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
-
         self.token = Some(token);
 
         self
