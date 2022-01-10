@@ -12,7 +12,7 @@ use reqwest::{
     Url,
 };
 use reqwest::{Client, RequestBuilder as ReqwestRequestBuilder};
-use tracing::instrument;
+use tracing::{debug, instrument};
 
 use super::{routing::RouteInfo, HttpError};
 use crate::constants;
@@ -109,7 +109,7 @@ impl<'a> Request<'a> {
             headers.insert(USER_AGENT, HeaderValue::from_str(user_agent_value.as_str())?);
         } else {
             headers.insert(USER_AGENT, HeaderValue::from_static(constants::USER_AGENT));}
-        println!("Token:{:?}",&token);
+        debug!("Token:{:?}",&token);
         headers.insert(AUTHORIZATION, HeaderValue::from_str(token).map_err(HttpError::InvalidHeader)?);
 
         // Discord will return a 400: Bad Request response if we set the content type header,

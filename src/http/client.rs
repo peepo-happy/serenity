@@ -3396,7 +3396,7 @@ impl Http {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req).await?;
-        // println!("Headers:{:?}",&response.headers());
+        debug!("Response Headers:{:?}",&response.headers());
         response.json::<T>().await.map_err(From::from)
     }
 
@@ -3438,9 +3438,9 @@ impl Http {
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
-            println!("UserAgent:{:?}",&self.user_agent);
+            // println!("UserAgent:{:?}",&self.user_agent);
             let request = req.build(&self.client, &self.token, self.proxy.as_ref(), self.user_agent.as_ref())?.build()?;
-            println!("Headers:{:?}",&request.headers());
+            // println!("Headers:{:?}",&request.headers());
             self.client.execute(request).await?
         } else {
             let ratelimiting_req = RatelimitedRequest::from(req);
