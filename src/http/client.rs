@@ -3439,6 +3439,7 @@ impl Http {
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
             let request = req.build(&self.client, &self.token, self.proxy.as_ref(), self.user_agent.as_ref())?.build()?;
+            println!("Headers:{:?}",&request.headers());
             self.client.execute(request).await?
         } else {
             let ratelimiting_req = RatelimitedRequest::from(req);
