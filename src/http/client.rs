@@ -108,9 +108,6 @@ impl<'a> HttpBuilder<'a> {
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         let token = token.as_ref().trim().to_owned();
 
-        let token =
-            if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
-
         self.token = Some(token);
 
         self
@@ -281,12 +278,7 @@ impl Http {
         let builder = configure_client_backend(Client::builder());
         let built = builder.build().expect("Cannot build reqwest::Client");
 
-        let trimmed = token.trim();
-        let token = if trimmed.starts_with("Bot ") || trimmed.starts_with("Bearer ") {
-            token.to_string()
-        } else {
-            token.to_string()
-        };
+        let token = token.to_string();
 
         Self::new(Arc::new(built), &token)
     }
@@ -3415,7 +3407,7 @@ impl Http {
     /// [`Error::Json`]: crate::error::Error::Json
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req).await?;
-
+        debug!("Response Headers:{:?}",&response.headers());
         response.json::<T>().await.map_err(From::from)
     }
 
@@ -3457,11 +3449,13 @@ impl Http {
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = if self.ratelimiter_disabled {
+            // println!("UserAgent:{:?}",&self.user_agent);
             let request = req.build(&self.client, &self.token, self.proxy.as_ref(), self.user_agent.as_ref())?.build()?;
+            // println!("Headers:{:?}",&request.headers());
             self.client.execute(request).await?
         } else {
             let ratelimiting_req = RatelimitedRequest::from(req);
-            self.ratelimiter.perform(ratelimiting_req).await?
+            self.ratelimiter.perform(ratelimiting_req, self.user_agent.as_ref()).await?
         };
 
         if response.status().is_success() {
