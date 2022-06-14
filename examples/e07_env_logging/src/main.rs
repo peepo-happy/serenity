@@ -44,7 +44,7 @@ impl EventHandler for Handler {
 // This additional information will also only be shown if the LOG level is set to `debug`
 #[instrument]
 async fn before(_: &Context, msg: &Message, command_name: &str) -> bool {
-    info!("Got command '{}' by user '{}'", command_name, msg.author.name);
+    // info!("Got command '{}' by user '{}'", command_name, msg.author.name);
 
     true
 }

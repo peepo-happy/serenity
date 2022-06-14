@@ -169,8 +169,8 @@ impl ShardQueuer {
         self.check_last_start().await;
 
         if let Err(why) = self.start(id, total).await {
-            warn!("[Shard Queuer] Err starting shard {}: {:?}", id, why);
-            info!("[Shard Queuer] Re-queueing start of shard {}", id);
+            // warn!("[Shard Queuer] Err starting shard {}: {:?}", id, why);
+            // info!("[Shard Queuer] Re-queueing start of shard {}", id);
 
             self.queue.push_back((id, total));
         }
@@ -232,7 +232,7 @@ impl ShardQueuer {
             runners.keys().cloned().collect::<Vec<_>>()
         };
 
-        info!("Shutting down all shards");
+        // info!("Shutting down all shards");
 
         for shard_id in keys {
             self.shutdown(shard_id, 1000).await;

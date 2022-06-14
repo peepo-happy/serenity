@@ -112,7 +112,7 @@ impl ShardRunner {
     /// [`ShardManager`]: super::ShardManager
     #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
-        info!("[ShardRunner {:?}] Running", self.shard.shard_info());
+        // info!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
             trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());

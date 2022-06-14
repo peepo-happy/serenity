@@ -104,7 +104,7 @@ impl EventHandler for Handler {
     }
 
     async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
-        info!("Cache is ready!");
+        // info!("Cache is ready!");
 
         let switch = Switch::new(
             [PACKAGE, DASHBOARD_CONFIG, GROUP_CONF, "Toggle Switch"],
@@ -319,7 +319,7 @@ async fn before_hook(ctx: &Context, _: &Message, cmd_name: &str) -> bool {
         command_count_value.use_count,
     );
 
-    info!("Running command {}", cmd_name);
+    // info!("Running command {}", cmd_name);
 
     true
 }

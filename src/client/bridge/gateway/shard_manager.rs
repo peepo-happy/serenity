@@ -241,7 +241,7 @@ impl ShardManager {
     /// [`ShardRunner`]: super::ShardRunner
     #[instrument(skip(self))]
     pub async fn restart(&mut self, shard_id: ShardId) {
-        info!("Restarting shard {}", shard_id);
+        // info!("Restarting shard {}", shard_id);
         self.shutdown(shard_id, 4000).await;
 
         let shard_total = self.shard_total;
@@ -271,7 +271,7 @@ impl ShardManager {
     #[instrument(skip(self))]
     #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
-        info!("Shutting down shard {}", shard_id);
+        // info!("Shutting down shard {}", shard_id);
 
         let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::ShutdownShard(shard_id, code));
 
@@ -312,7 +312,7 @@ impl ShardManager {
             runners.keys().cloned().collect::<Vec<_>>()
         };
 
-        info!("Shutting down all shards");
+        // info!("Shutting down all shards");
 
         for shard_id in keys {
             self.shutdown(shard_id, 1000).await;
@@ -324,7 +324,7 @@ impl ShardManager {
 
     #[instrument(skip(self))]
     fn boot(&mut self, shard_info: [ShardId; 2]) {
-        info!("Telling shard queuer to start shard {}", shard_info[0]);
+        // info!("Telling shard queuer to start shard {}", shard_info[0]);
 
         let msg = ShardQueuerMessage::Start(shard_info[0], shard_info[1]);
 
