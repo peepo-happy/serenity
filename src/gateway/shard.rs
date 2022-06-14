@@ -404,10 +404,10 @@ impl Shard {
                 return Err(Error::Gateway(GatewayError::NoAuthentication));
             },
             Some(close_codes::AUTHENTICATION_FAILED) => {
-                error!(
+                // error!(
                     // "[Shard {:?}] Sent invalid authentication, please check the token.",
-                    self.shard_info
-                );
+                    // self.shard_info
+                // );
 
                 return Err(Error::Gateway(GatewayError::InvalidAuthentication));
             },
